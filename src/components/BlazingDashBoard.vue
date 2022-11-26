@@ -31,6 +31,16 @@
       </div>
 
       <button @click="getCard">Fetch Card</button>
+
+      <div v-if="is8Mode">
+        <button
+          @click="selectCard(index)"
+          v-for="(item, index) in color"
+          :key="index"
+        >
+          {{ item }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -40,6 +50,8 @@ import Blaze from "blazing8s";
 export default {
   data() {
     return {
+      is8Mode: false,
+      chooseColor: 0,
       game: {
         activePlayer: {
           username: null,
@@ -80,11 +92,37 @@ export default {
     },
   },
 
+  watch: {
+    is8Mode(val) {
+      if (!val) {
+        this.game.setCard(
+          this.cardDetail[0],
+          this.cardDetail[1],
+          this.chooseColor
+        );
+        this.copyBoard();
+      }
+    },
+  },
+
   methods: {
+    selectCard(index) {
+      this.chooseColor = index;
+      this.is8Mode = false;
+    },
     setCard(card, pos) {
+      if (card.code === 8) {
+        this.specialSelection(card, pos);
+        return;
+      }
       console.log(card, pos);
       this.game.setCard(card, pos);
       this.copyBoard();
+    },
+
+    specialSelection(card, pos) {
+      this.cardDetail = [card, pos];
+      this.is8Mode = true;
     },
 
     getCard() {
