@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 
 import "./assets/main.css";
 
-const socket = io.connect("http://localhost:4200"); // Establish the connection
+const socket = io.connect("https://socket-codechit.herokuapp.com"); // Establish the connection
 
 const app = createApp(App);
 
