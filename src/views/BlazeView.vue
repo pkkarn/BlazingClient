@@ -1,14 +1,15 @@
 <template>
   <div>
-    <BlazingDashboard />
+    <BlazingDashBoard />
   </div>
 </template>
 
 <script>
-import BlazingDashboard from "@/components/BlazingDashboard.vue";
+// eslint-disable-next-line
+import BlazingDashBoard from "../components/BlazingDashBoard.vue";
 export default {
   components: {
-    BlazingDashboard,
+    BlazingDashBoard,
   },
 };
 </script>
