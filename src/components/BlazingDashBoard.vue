@@ -2,27 +2,33 @@
   <div id="blaze">
     <div class="player" v-for="player in game.board" :key="player.username">
       <span>{{ player.username }}</span>
-
-      <li
-        class="cards"
-        :style="colorSelection(card)"
-        v-for="(card, index) in player.cards"
-        :key="card"
-      >
-        {{ card.code }} - {{ card.value }} - {{ color[card.color] }} -
-        {{ card.color }}
-        <button
-          @click="setCard(card, index)"
-          v-if="matchCard(card, player.username)"
+      <div v-if="player.username === username">
+        <li
+          class="cards"
+          :style="colorSelection(card)"
+          v-for="(card, index) in player.cards"
+          :key="card"
         >
-          Match
-        </button>
-      </li>
+          {{ card.code }} - {{ card.value }} - {{ color[card.color] }} -
+          {{ card.color }}
+          <button
+            @click="setCard(card, index)"
+            v-if="matchCard(card, player.username)"
+          >
+            Match
+          </button>
+        </li>
+      </div>
+      <div v-else>
+        <li class="cards" v-for="card in player.cards" :key="card">
+          Don't need to know
+        </li>
+      </div>
       <div
         class="status"
         :class="{ active: activePlayer.username === player.username }"
       >
-        <button @click="pass">Pass</button>
+        <button v-if="isAmActive(player.username)" @click="pass">Pass</button>
       </div>
     </div>
     <div>
@@ -30,7 +36,7 @@
         <h2>{{ activeCard.value }}</h2>
       </div>
 
-      <button @click="getCard">Fetch Card</button>
+      <button v-if="isAmActive(username)" @click="getCard">Fetch Card</button>
 
       <div v-if="is8Mode">
         <button
@@ -111,6 +117,12 @@ export default {
   },
 
   methods: {
+    isAmActive(username) {
+      return (
+        this.activePlayer.username === username &&
+        this.activePlayer.username === this.username
+      ); // naruto === naruto // pkkarn ===
+    },
     selectCard(index) {
       this.chooseColor = index;
       this.is8Mode = false;
