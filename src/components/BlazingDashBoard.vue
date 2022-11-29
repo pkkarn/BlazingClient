@@ -1,6 +1,6 @@
 <template>
   <div id="blaze">
-    <div class="player" v-for="player in boardCopy" :key="player.username">
+    <div class="player" v-for="player in game.board" :key="player.username">
       <span>{{ player.username }}</span>
 
       <li
@@ -46,61 +46,66 @@
 </template>
 
 <script>
-import Blaze from "blazing8s";
 export default {
   data() {
     return {
       is8Mode: false,
       chooseColor: 0,
       game: {
-        activePlayer: {
-          username: null,
+        detail: {
+          activePlayer: {
+            username: null,
+          },
+          activeCard: {
+            color: 0,
+            code: 0,
+            value: null,
+          },
         },
-        activeCard: {
-          color: 0,
-          code: 0,
-          value: null,
-        },
+        board: {},
       },
-      boardCopy: {},
       color: ["red", "green", "blue", "yellow"],
       num: 0,
     };
   },
 
   mounted() {
-    this.game = new Blaze.BlazingBoard([
-      "Naruto",
-      "Sasuke",
-      "Sakura",
-      "Hinata",
-    ]);
+    // console.log(this.game.activeCard);
+    this.username = prompt("Enter your username");
+    this.$socket.emit("start_game", { username: this.username });
+    this.$socket.on("add_player", (data) => {
+      this.game = data.game;
+    });
 
-    console.log(this.game.activeCard);
+    this.$socket.on("remove_player", (data) => {
+      this.game = data.game;
+    });
 
-    this.copyBoard();
+    this.$socket.on("update_board", (data) => {
+      this.game = data;
+    });
+    // this.copyBoard();
   },
 
   computed: {
     activeCard() {
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      return this.game.activeCard;
+      return this.game.detail.activeCard;
     },
 
     activePlayer() {
-      return this.game.activePlayer;
+      return this.game.detail.activePlayer;
     },
   },
 
   watch: {
     is8Mode(val) {
       if (!val) {
-        this.game.setCard(
-          this.cardDetail[0],
-          this.cardDetail[1],
-          this.chooseColor
-        );
-        this.copyBoard();
+        this.$socket.emit("set_card", {
+          card: this.cardDetail[0],
+          pos: this.cardDetail[1],
+          color: this.chooseColor,
+        });
       }
     },
   },
@@ -115,9 +120,10 @@ export default {
         this.specialSelection(card, pos);
         return;
       }
-      console.log(card, pos);
-      this.game.setCard(card, pos);
-      this.copyBoard();
+      this.$socket.emit("set_card", {
+        card: card,
+        pos: pos,
+      });
     },
 
     specialSelection(card, pos) {
@@ -126,13 +132,11 @@ export default {
     },
 
     getCard() {
-      this.game.fetchCard();
-      this.copyBoard();
+      this.$socket.emit("get_card");
     },
 
     pass() {
-      this.game.pass();
-      this.copyBoard();
+      this.$socket.emit("pass_card");
     },
     matchCard(card, username) {
       let currentUser = this.activePlayer.username === username;
@@ -156,19 +160,6 @@ export default {
     addNum() {
       console.log(this.num);
       this.num++;
-    },
-    copyBoard() {
-      let curr = this.game.firstPlayer;
-      while (curr) {
-        console.log(curr);
-        let temp = {};
-        temp.username = curr.username;
-        temp.cards = curr.cards;
-        temp.status = curr.status;
-
-        this.boardCopy[temp.username] = temp;
-        curr = curr.next;
-      }
     },
   },
 };
