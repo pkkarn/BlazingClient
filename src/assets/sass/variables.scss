@@ -1,0 +1,22 @@
+$primary-color: rgb(62, 62, 62);
+$secondary-color: rgb(252, 156, 62);
+$font-color: #fff;
+$font-family: 'Poppins', sans-serif;
+
+@mixin neoEffect {
+    border-radius: 10px;
+    background: #3e3e3e;
+    box-shadow:  15px 15px 29px #353535,
+                -15px -15px 29px #474747;
+    margin: 20px;
+    padding: 20px;
+}
+
+@mixin secondaryNeo {
+    border-radius: 10px;
+    margin: 20px;
+    padding: 20px;
+    background: #fca53e;
+    box-shadow:  15px 15px 29px #d68c35,
+                -15px -15px 29px #ffbe47;
+}
