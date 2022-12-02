@@ -77,8 +77,12 @@ export default {
 
   mounted() {
     // console.log(this.game.activeCard);
-    this.username = prompt("Enter your username");
-    this.$socket.emit("start_game", { username: this.username });
+    console.log(this.userDetail);
+    this.$socket.emit("start_game", {
+      username: this.$store.state.userDetail.username,
+      room: this.$store.state.userDetail.room,
+    });
+    this.username = this.$store.state.userDetail.username;
     this.$socket.on("add_player", (data) => {
       this.game = data.game;
     });
@@ -94,6 +98,10 @@ export default {
   },
 
   computed: {
+    userDetail() {
+      return this.$store.state.userDetail;
+    },
+
     activeCard() {
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
       return this.game.detail.activeCard;
@@ -108,9 +116,12 @@ export default {
     is8Mode(val) {
       if (!val) {
         this.$socket.emit("set_card", {
-          card: this.cardDetail[0],
-          pos: this.cardDetail[1],
-          color: this.chooseColor,
+          data: {
+            card: this.cardDetail[0],
+            pos: this.cardDetail[1],
+            color: this.chooseColor,
+          },
+          room: this.userDetail.room,
         });
       }
     },
@@ -133,8 +144,11 @@ export default {
         return;
       }
       this.$socket.emit("set_card", {
-        card: card,
-        pos: pos,
+        data: {
+          card: card,
+          pos: pos,
+        },
+        room: this.userDetail.room,
       });
     },
 
@@ -144,11 +158,11 @@ export default {
     },
 
     getCard() {
-      this.$socket.emit("get_card");
+      this.$socket.emit("get_card", this.userDetail.room);
     },
 
     pass() {
-      this.$socket.emit("pass_card");
+      this.$socket.emit("pass_card", this.userDetail.room);
     },
     matchCard(card, username) {
       let currentUser = this.activePlayer.username === username;

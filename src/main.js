@@ -2,10 +2,11 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
 import { io } from "socket.io-client";
+import store from "./store";
 
 import "./assets/main.css";
 
-const socket = io.connect("https://socket-codechit.herokuapp.com"); // Establish the connection
+const socket = io.connect("http://localhost:4200"); // Establish the connection
 
 const app = createApp(App);
 
@@ -14,6 +15,8 @@ app.use({
     app.config.globalProperties.$socket = socket;
   },
 });
+
+app.use(store);
 
 app.use(router);
 
